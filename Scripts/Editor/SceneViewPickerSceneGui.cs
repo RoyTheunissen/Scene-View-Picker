@@ -10,12 +10,12 @@ using Object = UnityEngine.Object;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
-namespace RoyTheunissen.SceneViewPicking
+namespace RoyTheunissen.SceneViewPicker
 {
     /// <summary>
     /// Responsible for the scene gui part of picking from the scene view.
     /// </summary>
-    public partial class SceneViewPickingPropertyDrawer
+    public partial class SceneViewPickerPropertyDrawer
     {
         private int controlID;
         private static SerializedProperty propertyPicking;
@@ -615,7 +615,7 @@ namespace RoyTheunissen.SceneViewPicking
         
             if (castSafeMethod == null)
             {
-                castSafeMethod = typeof(SceneViewPickingPropertyDrawer).GetMethod(
+                castSafeMethod = typeof(SceneViewPickerPropertyDrawer).GetMethod(
                     "CastStronglyTyped", BindingFlags.NonPublic | BindingFlags.Static);
             }
 

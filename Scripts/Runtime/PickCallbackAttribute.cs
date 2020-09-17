@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RoyTheunissen.SceneViewPicking
+namespace RoyTheunissen.SceneViewPicker
 {
     /// <summary>
     /// Signifies that you want to receive a callback when this field gets picked.

@@ -1,5 +1,5 @@
 {
-    "name": "SceneViewPicking.Editor",
+    "name": "SceneViewPicker.Editor",
     "references": [
         "GUID:bf640a599fd7cfa40bba6e79d6cf0399"
     ],

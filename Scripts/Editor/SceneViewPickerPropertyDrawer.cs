@@ -6,13 +6,13 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace RoyTheunissen.SceneViewPicking
+namespace RoyTheunissen.SceneViewPicker
 {
     /// <summary>
     /// Visualizes a button for all Object fields to pick it from the scene.
     /// </summary>
     [CustomPropertyDrawer(typeof(Object), true)]
-    public partial class SceneViewPickingPropertyDrawer : PropertyDrawer
+    public partial class SceneViewPickerPropertyDrawer : PropertyDrawer
     {
         private class CachedIcon
         {
@@ -40,9 +40,9 @@ namespace RoyTheunissen.SceneViewPicking
             }
         }
         
-        private CachedIcon buttonGuiContentPro = new CachedIcon("SceneViewPickingIcon");
-        private CachedIcon buttonGuiContentPersonal = new CachedIcon("SceneViewPickingIconLightSkin");
-        private CachedIcon buttonGuiContentActive = new CachedIcon("SceneViewPickingIconActive");
+        private CachedIcon buttonGuiContentPro = new CachedIcon("SceneViewPickerIcon");
+        private CachedIcon buttonGuiContentPersonal = new CachedIcon("SceneViewPickerIconLightSkin");
+        private CachedIcon buttonGuiContentActive = new CachedIcon("SceneViewPickerIconActive");
 
         private GUIStyle cachedButtonStyle;
 
