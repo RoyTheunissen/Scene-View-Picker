@@ -13,7 +13,7 @@
 	"extension",
 	"object",
 	"assign",
-	"assignment",
+	"assignment"
   ],
   "category": "editor extensions",
   "homepage": "https://github.com/RoyTheunissen/Scene-View-Picker",
