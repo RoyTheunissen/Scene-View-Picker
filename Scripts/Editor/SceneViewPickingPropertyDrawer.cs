@@ -1,0 +1,227 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+namespace RoyTheunissen.SceneViewPicking
+{
+    /// <summary>
+    /// Visualizes a button for all Object fields to pick it from the scene.
+    /// </summary>
+    [CustomPropertyDrawer(typeof(Object), true)]
+    public partial class SceneViewPickingPropertyDrawer : PropertyDrawer
+    {
+        private class CachedIcon
+        {
+            private string path;
+            
+            private GUIContent cachedGuiContent;
+            private GUIContent GuiContent
+            {
+                get
+                {
+                    if (cachedGuiContent == null)
+                        cachedGuiContent = new GUIContent(Resources.Load<Texture2D>(path));
+                    return cachedGuiContent;
+                }
+            }
+
+            public CachedIcon(string path)
+            {
+                this.path = path;
+            }
+
+            public static implicit operator GUIContent(CachedIcon cachedIcon)
+            {
+                return cachedIcon.GuiContent;
+            }
+        }
+        
+        private CachedIcon buttonGuiContentPro = new CachedIcon("SceneViewPickingIcon");
+        private CachedIcon buttonGuiContentPersonal = new CachedIcon("SceneViewPickingIconLightSkin");
+        private CachedIcon buttonGuiContentActive = new CachedIcon("SceneViewPickingIconActive");
+
+        private GUIStyle cachedButtonStyle;
+
+        private GUIStyle ButtonStyle
+        {
+            get
+            {
+                if (cachedButtonStyle == null)
+                    cachedButtonStyle = new GUIStyle();
+                return cachedButtonStyle;
+            }
+        }
+
+        public delegate void DefaultFieldDrawer(
+            Rect position, SerializedProperty property, GUIContent label);
+        
+        private bool HasTransform(Type type)
+        {
+            // Yes, interface references have Transforms. Technically the implementor could inherit
+            // from System.Object but in practice they will always inherit from MonoBehaviour.
+            // Pinky promise.
+            if (IsInterfaceReference(type))
+                return true;
+            
+            // ROY: Sadly the 'transform' field is not shared by a common base class between 
+            // Component and GameObject, so if we want to support both we have to check it like this. 
+
+            return typeof(Component).IsAssignableFrom(type) ||
+                   typeof(GameObject).IsAssignableFrom(type);
+        }
+
+        private bool IsPrefab(Object targetObject)
+        {
+            Component component = targetObject as Component;
+
+            if (component == null)
+                return false;
+
+            return !component.gameObject.scene.IsValid();
+        }
+
+        private Type GetPickType(Type fieldType)
+        {
+            // If it's an interface reference we actually want to get the type of interface.
+            if (IsInterfaceReference(fieldType))
+                return fieldType.BaseType.GetGenericArguments()[0];
+            
+            return fieldType;
+        }
+
+        private bool IsInterfaceReference(Type fieldType)
+        {
+            // ROY: This is a little bit hacky but this maintains support for interface references without having a
+            // hard dependency on it. That way you and I can both use this package.
+            return fieldType.BaseType.BaseType.Name == "InterfaceReferenceBase";
+        }
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            OnGUI(position, property, label);
+        }
+
+        protected void OnGUI(
+            Rect position, SerializedProperty property, GUIContent label,
+            DefaultFieldDrawer defaultFieldDrawer = null)
+        {   
+            Type pickType = IsCollection(fieldInfo.FieldType)
+                ? GetCollectionElementType(fieldInfo.FieldType)
+                : fieldInfo.FieldType;
+
+            Type pickTypePacked = pickType;
+
+            // Unpack it. If it's an interface reference, then the pick type is actually the
+            // interface type. Separate from the array check because it can ALSO be an array.
+            pickType = GetPickType(pickType);
+
+            bool isValid = HasTransform(pickTypePacked) &&
+                           !IsPrefab(property.serializedObject.targetObject);
+
+            if (!isValid)
+            {
+                if (defaultFieldDrawer != null)
+                    defaultFieldDrawer(position, property, label);
+                else
+                    EditorGUI.PropertyField(position, property, label, true);
+                return;
+            }
+
+            float width = 18;
+            float space = 4;
+
+            Rect positionField = position;
+            positionField.xMax -= width + space - 4;
+
+            Object previousValue = property.objectReferenceValue;
+
+            // Draw the field itself. Either use the drawer that was supplied or do a generic one.
+            EditorGUI.BeginChangeCheck();
+            if (defaultFieldDrawer != null)
+                defaultFieldDrawer(positionField, property, label);
+            else
+                EditorGUI.PropertyField(positionField, property, label, true);
+            bool didManuallyAssignNewValue = EditorGUI.EndChangeCheck();
+
+            Rect positionPicker = new Rect(
+                positionField.xMax + space, positionField.yMin - 1, width, position.height);
+
+            bool wasPicking = PropertyPicking == property ||
+                              (PropertyPicking != null &&
+                               PropertyPicking.serializedObject ==
+                               property.serializedObject &&
+                               PropertyPicking.propertyPath == property.propertyPath);
+
+            GUIContent icon;
+            if (wasPicking)
+                icon = buttonGuiContentActive;
+            else
+                icon = EditorGUIUtility.isProSkin ? buttonGuiContentPro : buttonGuiContentPersonal;
+            
+            bool wantsToPick = GUI.Toggle(positionPicker, wasPicking, icon, ButtonStyle);
+
+            // If we manually assigned a new value, try to fire the callback.
+            if (didManuallyAssignNewValue)
+            {
+                Object currentValue = property.objectReferenceValue;
+
+                PickCallbackAttribute attribute = GetAttribute<PickCallbackAttribute>(fieldInfo);
+
+                if (attribute != null)
+                {
+                    string callback = attribute.CallbackName;
+
+                    FireSceneViewPickerCallback(
+                        property, callback, previousValue, currentValue);
+                }
+            }
+
+            if (wasPicking && (!wantsToPick || didManuallyAssignNewValue))
+                StopPicking();
+
+            if (!wasPicking && wantsToPick)
+                StartPicking(property, fieldInfo, pickType);
+        }
+
+        private bool IsCollection(Type type)
+        {
+            if (type.IsArray)
+                return true;
+
+            if (type.IsGenericTypeDefinition && type.GetGenericTypeDefinition() == typeof(List<>))
+                return true;
+
+            return false;
+        }
+
+        private Type GetCollectionElementType(Type collectionType)
+        {
+            if (collectionType.IsArray)
+                return collectionType.GetElementType();
+            
+            if (typeof(List<>) == collectionType.GetGenericTypeDefinition())
+                return collectionType.GetGenericArguments()[0];
+            
+            return null;
+        }
+
+        private void StartPicking(SerializedProperty property, FieldInfo fieldInfo, Type pickType)
+        {
+            PickCallbackAttribute attribute = GetAttribute<PickCallbackAttribute>(fieldInfo);
+            string callback = attribute == null ? null : attribute.CallbackName;
+            
+            StartPicking(property, pickType, callback);
+        }
+        
+        public static T GetAttribute<T>(MemberInfo memberInfo, bool inherit = true)
+            where T : Attribute
+        {
+            object[] attributes = memberInfo.GetCustomAttributes(inherit);
+            return attributes.OfType<T>().FirstOrDefault();
+        }
+    }
+}
