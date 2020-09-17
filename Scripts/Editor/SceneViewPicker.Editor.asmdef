@@ -1,0 +1,17 @@
+{
+    "name": "SceneViewPicking.Editor",
+    "references": [
+        "GUID:bf640a599fd7cfa40bba6e79d6cf0399"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
