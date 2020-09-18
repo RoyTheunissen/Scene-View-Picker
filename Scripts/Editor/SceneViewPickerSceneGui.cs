@@ -432,7 +432,10 @@ namespace RoyTheunissen.SceneViewPicker
         {
             if (@object is Component component)
                 return component.gameObject.scene;
-            
+
+            if (@object is GameObject gameObject)
+                return gameObject.scene;
+
             return default(Scene);
         }
         
@@ -460,6 +463,38 @@ namespace RoyTheunissen.SceneViewPicker
                     objects.RemoveAt(i);
             }
         }
+
+        private void FindGameObjectsInSceneOrPrefab(ref List<Object> @objects)
+        {
+            Scene currentScene = GetScene(propertyPicking.serializedObject.targetObject);
+
+            // If there is a valid scene, use that scene to find candidates instead.
+            objects.Clear();
+            if (currentScene.IsValid())
+            {
+                GameObject[] rootGameObjects = currentScene.GetRootGameObjects();
+                for (int i = 0; i < rootGameObjects.Length; i++)
+                {
+                    Transform[] transforms = rootGameObjects[i].GetComponentsInChildren<Transform>();
+                    for (int j = 0; j < transforms.Length; j++)
+                    {
+                        Transform transform = transforms[j];
+                        objects.Add(transform.gameObject);
+                    }
+                }
+            }
+            else
+            {
+                objects.AddRange(Object.FindObjectsOfType(typeof(GameObject)));
+            }
+
+            // Filter out components belonging to the wrong scene.
+            for (int i = objects.Count - 1; i >= 0; i--)
+            {
+                if (GetScene(objects[i]) != currentScene)
+                    objects.RemoveAt(i);
+            }
+        }
         
         private void FindAllCandidates(Type type)
         {
@@ -477,6 +512,10 @@ namespace RoyTheunissen.SceneViewPicker
                     if (isInterface && !type.IsInstanceOfType(possibleCandidateObjects[i]))
                         possibleCandidateObjects.RemoveAt(i);
                 }
+            }
+            else if (type == typeof(GameObject))
+            {
+                FindGameObjectsInSceneOrPrefab(ref possibleCandidateObjects);
             }
             else
             {
