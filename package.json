@@ -15,6 +15,10 @@
 	"assign",
 	"assignment"
   ],
+  "author": {
+    "name": "Roy Theunissen",
+    "url": "https://www.roytheunissen.com"
+  },
   "category": "editor extensions",
   "homepage": "https://github.com/RoyTheunissen/Scene-View-Picker",
   "repository": {
