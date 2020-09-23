@@ -48,9 +48,6 @@ You can also install via git URL by adding this entry in your **manifest.json**
 from Window->Package Manager, click on the + sign and Add from git: https://github.com/RoyTheunissen/Scene-View-Picker.git
 ```
 
-### Known Issues
-- Apparently it doesn't seem to play nice with Odin Inspector. I'll look into this!
-
 
 ## Contact
 [Roy Theunissen](https://roytheunissen.com)
