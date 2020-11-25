@@ -95,6 +95,9 @@ namespace RoyTheunissen.SceneViewPicker
 
         private bool IsInterfaceReference(Type fieldType)
         {
+            if (fieldType.BaseType == null || fieldType.BaseType.BaseType == null)
+                return false;
+            
             // ROY: This is a little bit hacky but this maintains support for interface references without having a
             // hard dependency on it. That way you and I can both use this package.
             return fieldType.BaseType.BaseType.Name == "InterfaceReferenceBase";
