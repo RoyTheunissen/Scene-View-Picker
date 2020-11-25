@@ -1,7 +1,7 @@
 {
   "name": "com.roytheunissen.sceneviewpicker",
   "displayName": "Scene View Picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "unity": "2019.1",
   "description": "Extension that lets you assign any Object field by picking it from the scene view.",
   "keywords": [
