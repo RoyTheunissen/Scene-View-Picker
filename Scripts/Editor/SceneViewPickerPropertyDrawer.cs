@@ -195,7 +195,7 @@ namespace RoyTheunissen.SceneViewPicker
             if (type.IsArray)
                 return true;
 
-            if (type.IsGenericTypeDefinition && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
                 return true;
 
             return false;
