@@ -1,7 +1,7 @@
 
 [![Roy Theunissen](Documentation~/GithubHeader.jpg)](http://roytheunissen.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE.md)
-![GitHub Follow](https://img.shields.io/github/followers/RoyTheunissen?label=RoyTheunissen&style=social) ![Twitter](https://img.shields.io/twitter/follow/MisterRoyzo?style=social)
+![GitHub Follow](https://img.shields.io/github/followers/RoyTheunissen?label=RoyTheunissen&style=social) ![Twitter](https://img.shields.io/twitter/follow/RoyTheunissen?style=social)
 
 _Unity extension to allow you to assign Object fields by picking it from the scene view_
 
