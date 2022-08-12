@@ -15,7 +15,7 @@ namespace RoyTheunissen.SceneViewPicker
     /// <summary>
     /// Responsible for the scene gui part of picking from the scene view.
     /// </summary>
-    public partial class SceneViewPickerPropertyDrawer
+    public static partial class SceneViewPicking
     {
         private static int controlID;
         private static SerializedProperty propertyPicking;
