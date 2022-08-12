@@ -17,7 +17,7 @@ namespace RoyTheunissen.SceneViewPicker
     /// </summary>
     public partial class SceneViewPickerPropertyDrawer
     {
-        private int controlID;
+        private static int controlID;
         private static SerializedProperty propertyPicking;
         private static string pickCallback;
 
@@ -129,10 +129,10 @@ namespace RoyTheunissen.SceneViewPicker
             }
         }
 
-        private List<Object> possibleCandidateObjects = new List<Object>();
+        private static List<Object> possibleCandidateObjects = new List<Object>();
         private static List<Candidate> allCandidates = new List<Candidate>();
 
-        private Candidate bestCandidate;
+        private static Candidate bestCandidate;
         
         private static List<Candidate> nearbyCandidates = new List<Candidate>();
 
@@ -140,8 +140,8 @@ namespace RoyTheunissen.SceneViewPicker
 
         public static SerializedProperty PropertyPicking => propertyPicking;
 
-        private GUIStyle cachedPickingTextStyle;
-        public GUIStyle PickingTextStyle
+        private static GUIStyle cachedPickingTextStyle;
+        public static GUIStyle PickingTextStyle
         {
             get
             {
@@ -156,7 +156,7 @@ namespace RoyTheunissen.SceneViewPicker
             }
         }
 
-        private void OnSceneGUI(SceneView sceneView)
+        private static void OnSceneGUI(SceneView sceneView)
         {
             if (propertyPicking == null)
             {
@@ -243,7 +243,7 @@ namespace RoyTheunissen.SceneViewPicker
             Event.current.Use();
         }
 
-        private void PickNearbyCandidate()
+        private static void PickNearbyCandidate()
         {
             GenericMenu menu = new GenericMenu();
             menu.allowDuplicateNames = true;
@@ -259,7 +259,7 @@ namespace RoyTheunissen.SceneViewPicker
             menu.ShowAsContext();
         }
 
-        private void PickCandidate(Candidate candidate)
+        private static void PickCandidate(Candidate candidate)
         {
             if (propertyPicking == null || !candidate.IsValid)
                 return;
@@ -278,18 +278,18 @@ namespace RoyTheunissen.SceneViewPicker
             StopPicking();
         }
 
-        public void FireSceneViewPickerCallback(Object previousValue, Object currentValue)
+        public static void FireSceneViewPickerCallback(Object previousValue, Object currentValue)
         {
             FireSceneViewPickerCallback(propertyPicking, pickCallback, previousValue, currentValue);
         }
 
-        public void FireSceneViewPickerCallback(
+        public static void FireSceneViewPickerCallback(
             SerializedProperty property, string callback, Object previousValue, Object currentValue)
         {
             if (property == null || string.IsNullOrEmpty(callback))
                 return;
 
-            object target = GetParentObject(this, property);
+            object target = GetParentObject(property);
             MethodInfo method = GetMethodIncludingFromBaseClasses(target.GetType(), callback);
             if (method == null)
             {
@@ -315,7 +315,7 @@ namespace RoyTheunissen.SceneViewPicker
             method.Invoke(target, new object[0]);
         }
 
-        private float GetDistanceToMouse(Candidate candidate, SceneView sceneView)
+        private static float GetDistanceToMouse(Candidate candidate, SceneView sceneView)
         {
             // Figure out where the object is relative to the scene view camera.
             Vector3 positionScreen = candidate.GetScreenPosition(sceneView);
@@ -329,7 +329,7 @@ namespace RoyTheunissen.SceneViewPicker
             return Vector3.Distance(mouseScreen, positionScreen);
         }
         
-        private float GetDistance(Candidate candidate1, Candidate candidate2, SceneView sceneView)
+        private static float GetDistance(Candidate candidate1, Candidate candidate2, SceneView sceneView)
         {
             // Figure out where the object is relative to the scene view camera.
             Vector3 positionScreen1 = candidate1.GetScreenPosition(sceneView);
@@ -342,7 +342,7 @@ namespace RoyTheunissen.SceneViewPicker
             return Vector3.Distance(positionScreen1, positionScreen2);
         }
 
-        private Candidate FindBestCandidate(SceneView sceneView)
+        private static Candidate FindBestCandidate(SceneView sceneView)
         {
             float distanceMin = float.PositiveInfinity;
             Candidate bestCandidate = default(Candidate);
@@ -365,7 +365,7 @@ namespace RoyTheunissen.SceneViewPicker
             return bestCandidate;
         }
         
-        private void FindNearbyCandidates(SceneView sceneView)
+        private static void FindNearbyCandidates(SceneView sceneView)
         {
             nearbyCandidates.Clear();
             
@@ -386,7 +386,7 @@ namespace RoyTheunissen.SceneViewPicker
             nearbyCandidates.Sort(SortNearbyCandidates);
         }
 
-        private int SortNearbyCandidates(Candidate x, Candidate y)
+        private static int SortNearbyCandidates(Candidate x, Candidate y)
         {
             float distanceXToBestCandidate = Vector3.Distance(x.Position, bestCandidate.Position);
             float distanceYToBestCandidate = Vector3.Distance(y.Position, bestCandidate.Position);
@@ -405,7 +405,7 @@ namespace RoyTheunissen.SceneViewPicker
             return x.HierarchyOrder.CompareTo(y.HierarchyOrder);
         }
 
-        public void StartPicking(SerializedProperty property, Type type, string callback)
+        public static void StartPicking(SerializedProperty property, Type type, string callback)
         {
             if (!hasShownHint)
             {
@@ -428,7 +428,7 @@ namespace RoyTheunissen.SceneViewPicker
             SceneView.lastActiveSceneView.Repaint();
         }
 
-        private Scene GetScene(Object @object)
+        private static Scene GetScene(Object @object)
         {
             if (@object is Component component)
                 return component.gameObject.scene;
@@ -439,7 +439,7 @@ namespace RoyTheunissen.SceneViewPicker
             return default(Scene);
         }
         
-        private void FindObjectsOfTypeInSceneOrPrefab(Type type, ref List<Object> @objects)
+        private static void FindObjectsOfTypeInSceneOrPrefab(Type type, ref List<Object> @objects)
         {
             Scene currentScene = GetScene(propertyPicking.serializedObject.targetObject);
 
@@ -464,7 +464,7 @@ namespace RoyTheunissen.SceneViewPicker
             }
         }
 
-        private void FindGameObjectsInSceneOrPrefab(ref List<Object> @objects)
+        private static void FindGameObjectsInSceneOrPrefab(ref List<Object> @objects)
         {
             Scene currentScene = GetScene(propertyPicking.serializedObject.targetObject);
 
@@ -496,7 +496,7 @@ namespace RoyTheunissen.SceneViewPicker
             }
         }
         
-        private void FindAllCandidates(Type type)
+        private static void FindAllCandidates(Type type)
         {
             bool isInterface = type.IsInterface;
             
@@ -527,7 +527,7 @@ namespace RoyTheunissen.SceneViewPicker
                 allCandidates.Add(new Candidate(possibleCandidateObjects[i]));
         }
 
-        public void StopPicking()
+        public static void StopPicking()
         {
             allCandidates.Clear();
             bestCandidate = default(Candidate);
@@ -565,7 +565,7 @@ namespace RoyTheunissen.SceneViewPicker
             return path;
         }
         
-        public static object GetParentObject(PropertyDrawer propertyDrawer, SerializedProperty property)
+        public static object GetParentObject(SerializedProperty property)
         {
             string path = property.propertyPath;
             int indexOfLastSeparator = path.LastIndexOf(".", StringComparison.Ordinal);

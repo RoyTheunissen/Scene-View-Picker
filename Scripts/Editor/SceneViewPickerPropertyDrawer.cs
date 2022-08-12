@@ -40,13 +40,12 @@ namespace RoyTheunissen.SceneViewPicker
             }
         }
         
-        private CachedIcon buttonGuiContentPro = new CachedIcon("SceneViewPickerIcon");
-        private CachedIcon buttonGuiContentPersonal = new CachedIcon("SceneViewPickerIconLightSkin");
-        private CachedIcon buttonGuiContentActive = new CachedIcon("SceneViewPickerIconActive");
+        private static readonly CachedIcon buttonGuiContentPro = new CachedIcon("SceneViewPickerIcon");
+        private static readonly CachedIcon buttonGuiContentPersonal = new CachedIcon("SceneViewPickerIconLightSkin");
+        private static readonly CachedIcon buttonGuiContentActive = new CachedIcon("SceneViewPickerIconActive");
 
-        private GUIStyle cachedButtonStyle;
-
-        private GUIStyle ButtonStyle
+        private static GUIStyle cachedButtonStyle;
+        private static GUIStyle ButtonStyle
         {
             get
             {
@@ -59,7 +58,7 @@ namespace RoyTheunissen.SceneViewPicker
         public delegate void DefaultFieldDrawer(
             Rect position, SerializedProperty property, GUIContent label);
         
-        private bool HasTransform(Type type)
+        private static bool HasTransform(Type type)
         {
             // Yes, interface references have Transforms. Technically the implementor could inherit
             // from System.Object but in practice they will always inherit from MonoBehaviour.
@@ -74,7 +73,7 @@ namespace RoyTheunissen.SceneViewPicker
                    typeof(GameObject).IsAssignableFrom(type);
         }
 
-        private bool IsPrefab(Object targetObject)
+        private static bool IsPrefab(Object targetObject)
         {
             Component component = targetObject as Component;
 
@@ -84,7 +83,7 @@ namespace RoyTheunissen.SceneViewPicker
             return !component.gameObject.scene.IsValid();
         }
 
-        private Type GetPickType(Type fieldType)
+        private static Type GetPickType(Type fieldType)
         {
             // If it's an interface reference we actually want to get the type of interface.
             if (IsInterfaceReference(fieldType))
@@ -93,7 +92,7 @@ namespace RoyTheunissen.SceneViewPicker
             return fieldType;
         }
 
-        private bool IsInterfaceReference(Type fieldType)
+        private static bool IsInterfaceReference(Type fieldType)
         {
             if (fieldType.BaseType == null || fieldType.BaseType.BaseType == null)
                 return false;
@@ -105,11 +104,11 @@ namespace RoyTheunissen.SceneViewPicker
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            OnGUI(position, property, label);
+            PropertyField(position, property, fieldInfo, label);
         }
 
-        protected void OnGUI(
-            Rect position, SerializedProperty property, GUIContent label,
+        public static void PropertyField(
+            Rect position, SerializedProperty property, FieldInfo fieldInfo, GUIContent label,
             DefaultFieldDrawer defaultFieldDrawer = null)
         {   
             Type pickType = IsCollection(fieldInfo.FieldType)
@@ -178,8 +177,7 @@ namespace RoyTheunissen.SceneViewPicker
                 {
                     string callback = attribute.CallbackName;
 
-                    FireSceneViewPickerCallback(
-                        property, callback, previousValue, currentValue);
+                    FireSceneViewPickerCallback(property, callback, previousValue, currentValue);
                 }
             }
 
@@ -190,7 +188,7 @@ namespace RoyTheunissen.SceneViewPicker
                 StartPicking(property, fieldInfo, pickType);
         }
 
-        private bool IsCollection(Type type)
+        private static bool IsCollection(Type type)
         {
             if (type.IsArray)
                 return true;
@@ -201,7 +199,7 @@ namespace RoyTheunissen.SceneViewPicker
             return false;
         }
 
-        private Type GetCollectionElementType(Type collectionType)
+        private static Type GetCollectionElementType(Type collectionType)
         {
             if (collectionType.IsArray)
                 return collectionType.GetElementType();
@@ -212,7 +210,7 @@ namespace RoyTheunissen.SceneViewPicker
             return null;
         }
 
-        private void StartPicking(SerializedProperty property, FieldInfo fieldInfo, Type pickType)
+        private static void StartPicking(SerializedProperty property, FieldInfo fieldInfo, Type pickType)
         {
             PickCallbackAttribute attribute = GetAttribute<PickCallbackAttribute>(fieldInfo);
             string callback = attribute == null ? null : attribute.CallbackName;
