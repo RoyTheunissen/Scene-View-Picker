@@ -86,19 +86,19 @@ namespace RoyTheunissen.SceneViewPicker
         {
             // If it's an interface reference we actually want to get the type of interface.
             if (IsInterfaceReference(fieldType))
-                return fieldType.BaseType.GetGenericArguments()[0];
+                return fieldType.GetGenericArguments()[0];
             
             return fieldType;
         }
 
         private static bool IsInterfaceReference(Type fieldType)
         {
-            if (fieldType.BaseType == null || fieldType.BaseType.BaseType == null)
+            if (fieldType.BaseType == null)
                 return false;
             
             // ROY: This is a little bit hacky but this maintains support for interface references without having a
             // hard dependency on it. That way you and I can both use this package.
-            return fieldType.BaseType.BaseType.Name == "InterfaceReferenceBase";
+            return fieldType.BaseType.Name == "InterfaceReferenceBase";
         }
 
         public static void PropertyField(
