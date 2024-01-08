@@ -1,9 +1,9 @@
 {
-    "name": "SceneViewPicker.Editor",
+    "name": "RoyTheunissen.SceneViewPicker.Editor",
+    "rootNamespace": "",
     "references": [
         "GUID:bf640a599fd7cfa40bba6e79d6cf0399"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -13,5 +13,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
