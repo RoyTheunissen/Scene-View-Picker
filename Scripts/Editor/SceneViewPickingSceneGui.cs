@@ -453,7 +453,11 @@ namespace RoyTheunissen.SceneViewPicker
             }
             else
             {
+#if UNITY_6000_0_OR_NEWER
+                objects.AddRange(Object.FindObjectsByType(type, FindObjectsSortMode.None));
+#else
                 objects.AddRange(Object.FindObjectsOfType(type));
+#endif
             }
 
             // Filter out components belonging to the wrong scene.
@@ -485,7 +489,11 @@ namespace RoyTheunissen.SceneViewPicker
             }
             else
             {
+#if UNITY_6000_0_OR_NEWER
+                objects.AddRange(Object.FindObjectsByType(typeof(GameObject), FindObjectsSortMode.None));
+#else
                 objects.AddRange(Object.FindObjectsOfType(typeof(GameObject)));
+#endif
             }
 
             // Filter out components belonging to the wrong scene.
