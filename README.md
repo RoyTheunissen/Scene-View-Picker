@@ -80,14 +80,15 @@ openupm add com.roytheunissen.sceneviewpicker
 ```
 
 ### Manifest
-You can also install via git URL by adding this entry in your **manifest.json**
+You can also install via git URL by adding this entry in your **manifest.json** (make sure to end with a comma if you're adding this at the top)
 ```
 "com.roytheunissen.sceneviewpicker": "https://github.com/RoyTheunissen/Scene-View-Picker.git"
 ```
 
 ### Unity Package Manager
+From Window->Package Manager, click on the + sign and Add from git: 
 ```
-from Window->Package Manager, click on the + sign and Add from git: https://github.com/RoyTheunissen/Scene-View-Picker.git
+https://github.com/RoyTheunissen/Scene-View-Picker.git
 ```
 
 
