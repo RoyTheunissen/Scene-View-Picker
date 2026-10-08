@@ -662,7 +662,7 @@ namespace RoyTheunissen.SceneViewPicker
         
             if (castSafeMethod == null)
             {
-                castSafeMethod = typeof(SceneViewPickerPropertyDrawer).GetMethod(
+                castSafeMethod = typeof(SceneViewPicking).GetMethod(
                     "CastStronglyTyped", BindingFlags.NonPublic | BindingFlags.Static);
             }
 
